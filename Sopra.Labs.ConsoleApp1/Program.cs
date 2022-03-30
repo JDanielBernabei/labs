@@ -63,7 +63,7 @@ namespace Sopra.Labs.ConsoleApp1
             Console.WriteLine("Introduzca el salto");
             result = int.TryParse(Console.ReadLine(), out salto);
 
-            for (int i = inicio; i < final; i += salto) //No me deja usar inicio como contador
+            for (int i = inicio; i < final; i += salto) 
             {
                 Console.WriteLine($"{i}");
             }
