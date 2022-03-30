@@ -6,7 +6,33 @@ namespace Sopra.Labs.ConsoleApp1
     {
         static void Main(string[] args)
         {
-            CalcularValores();
+            while (true)
+            {
+                Console.WriteLine("Introduzca Funcion:\n CalcularLetraDni - MostrarTablaMultiplicar - MostrarValores - CalcularValores - exit");
+
+                string funcion = Console.ReadLine();
+
+                if (funcion == "CalcularLetraDni")
+                {
+                    CalcularLetraDni();
+                }
+                else if (funcion == "MostrarTablaMultiplicar")
+                {
+                    MostrarTablaMultiplicar();
+                }
+                else if (funcion == "MostrarValores")
+                {
+                    MostrarValores();
+                }
+                else if (funcion == "CalcularValores")
+                {
+                    CalcularValores();
+                }
+                else if (funcion == "exit")
+                {
+                    break;
+                }
+            }            
         }
 
         static void CalcularLetraDni()
@@ -81,7 +107,7 @@ namespace Sopra.Labs.ConsoleApp1
             Console.WriteLine("Introduzca numero de valores");
             bool result = int.TryParse(Console.ReadLine(), out size);
 
-            if (size < 0)
+            if (size <= 0)
             {
                 Console.WriteLine("Tamaño incorrecto");
                 return;
