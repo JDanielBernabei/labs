@@ -14,29 +14,52 @@ namespace Sopra.Labs.ConsoleApp2
             static void BusquedasEjercicio()
             {
                 // Clientes nacidos entre 1980 y 1990
-                var clientes1 = (from r in DataLists.ListaClientes where r.FechaNac > new DateTime(1980, 1, 1)  && r.FechaNac < new DateTime(1990, 1, 1) select r);
+                var clientes1 = (from r 
+                                 in DataLists.ListaClientes 
+                                 where r.FechaNac >= new DateTime(1980, 1, 1)  && r.FechaNac < new DateTime(1990, 1, 1) 
+                                 select r);
                 foreach (var item in clientes1) Console.WriteLine($"{item.Nombre} {item.FechaNac}");
                 Console.WriteLine();
 
                 // Clientes > 25 años
-                var clientes2 = (from r in DataLists.ListaClientes where r.FechaNac < DateTime.Now.AddYears(-25) select r);
+                var clientes2 = (from r 
+                                 in DataLists.ListaClientes 
+                                 where r.FechaNac < DateTime.Now.AddYears(-25) 
+                                 select r);
                 foreach (var item in clientes2) Console.WriteLine($"{item.Nombre} {item.FechaNac}");
                 Console.WriteLine();
 
                 // Producto con el precio mas alto
-                var producto1 = (from r in DataLists.ListaProductos orderby r.Precio descending select r).FirstOrDefault();
+                var producto1 = (from r 
+                                 in DataLists.ListaProductos 
+                                 orderby r.Precio descending 
+                                 select r).FirstOrDefault();
                 Console.WriteLine($"{producto1.Descripcion} {producto1.Precio.ToString("N2")}");
                 Console.WriteLine();
 
                 // Predio medio de todos los productos
-                var producto2 = (from r in DataLists.ListaProductos select r.Precio).Average();
+                var producto2 = (from r 
+                                 in DataLists.ListaProductos 
+                                 select r.Precio).Average();
                 Console.WriteLine($"Media Productos = {producto2}");
                 Console.WriteLine();
 
                 // Productos con un precio inferior a la media
-                var producto3 = (from r in DataLists.ListaProductos where r.Precio < producto2 select r);
+                var producto3 = (from r 
+                                 in DataLists.ListaProductos 
+                                 where r.Precio < producto2 
+                                 select r);
+
                 foreach (var item in producto3) Console.WriteLine($"{item.Descripcion} {item.Precio.ToString("N2")}");
                 Console.WriteLine();
+                /*var producto4 = (from r
+                                 in DataLists.ListaProductos
+                                 where r.Precio < ( from x
+                                                    in DataLists.ListaProductos
+                                                    select x.Precio).Average()
+                                 select r);
+                foreach (var item in producto4) Console.WriteLine($"{item.Descripcion} {item.Precio.ToString("N2")}");
+                */
             }
         }
     }
