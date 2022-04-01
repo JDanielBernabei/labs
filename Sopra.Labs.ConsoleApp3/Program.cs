@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Data.SqlClient;
 using Sopra.Labs.ConsoleApp3.Models;
+using Microsoft.EntityFrameworkCore;
 
 namespace Sopra.Labs.ConsoleApp3
 {
@@ -11,7 +12,92 @@ namespace Sopra.Labs.ConsoleApp3
     {
         static void Main(string[] args)
         {
-            Ejercicios31032022();
+            Ejercicios01042022();
+        }
+
+        static void EjerciciosIncludeYIntersectYGroupBy() {
+            var context = new ModelNorthwind();
+
+            // Lineas de Pedidos, agrupadas por pedidos //se puede hacer por groupby, include o sub-select
+            var g1 = context.Order_Details
+                        .AsEnumerable()
+                        .GroupBy(r => r.OrderID)
+                        .ToList();
+
+            // Productos de la categoria Condiments y Seafood
+            string[] categorias = new string[] { "Condiments", "Seafood" };
+            var q1 = context.Products
+                .Include(r => r.Category)
+                .Where(r => categorias.Contains(r.Category.CategoryName))
+                .ToList();
+
+            // Listado de empleados: Nombre, Apellido, Numero total pedidos en 1997
+            var q2 = context.Orders
+                .Include(r => r.Employee)
+                .Where(r => r.OrderDate.Value.Year == 1997)
+                .Select(r => new { r.Employee.FirstName, r.Employee.LastName, r.Employee.Orders.Count })
+                .ToList();
+
+            // Listado de pedidos de los clientes de USA
+            var q3 = context.Orders
+                .Include(r => r.Customer)
+                .Where(r => r.Customer.Country == "USA")
+                .ToList ();
+
+            // Clientes pedido el producto 57
+            var q4 = context.Order_Details
+                .Where(r => r.ProductID == 57)
+                .Select (r => r.OrderID)
+                .ToList();
+            
+            var q5 = context.Orders
+                .Where (r => q4.Contains(r.OrderID))
+                .Select(r => new { r.OrderID, r.CustomerID })
+                .ToList ();
+
+            // Clientes pedido el producto 72 en 1997
+            var q6 = context.Order_Details
+                .Include(r => r.Order)
+                .Where(r => r.ProductID == 72 && r.Order.OrderDate.Value.Year == 1997)
+                .Select(r => new { r.OrderID, r.Order.CustomerID})
+                .ToList();
+
+            // Clientes pedido el producto 52 + 72 en 1997
+            int[] productos = new int[] { 52, 72 };
+            var q7 = q5.Intersect(q6);
+        }
+
+        static void Ejercicios01042022()
+        {
+            var context = new ModelNorthwind();
+
+            // Listado de empleados que son mayores que sus jefes (reportsTo es id Jefe)
+            var employeesOlderThanBoss = context.Employees
+                    .Where(r => r.BirthDate < context.Employees
+                                            .Where(s => s.EmployeeID == r.ReportsTo)
+                                            .Select(s => s.BirthDate)
+                                            .FirstOrDefault()
+                          )
+                    .ToList();
+
+
+            // Listado de productos: Nombre del Producto, Stock, Valor del Stock
+            var products = context.Products
+                    .Select(r => new { r.ProductName, r.UnitsInStock, stockValue = r.UnitsInStock * r.UnitPrice })
+                    .ToList();
+
+            // Listado de: Nombre, Apellido, Numero total de pedidos en 1997
+            var employeeOrder = context.Employees
+                .Select(r => new {r.FirstName, r.LastName, Orders = context.Orders
+                                                                .Count(s => s.OrderDate.Value.Year == 1997 && r.EmployeeID == s.EmployeeID)
+                })
+                .ToList();
+
+            // Tiempo medio (dias) de la preparacion de un pedido
+            var orderAvg = context.Orders
+                .Where(r => r.ShippedDate != null && r.OrderDate != null)
+                .AsEnumerable()
+                .Average(r => (r.ShippedDate - r.OrderDate).Value.Days);
         }
 
         static void Ejercicios31032022()
@@ -182,6 +268,7 @@ namespace Sopra.Labs.ConsoleApp3
 
             /*
              var r16 = CUSTOMERID == ARGENTINA
+                SELECT CustomerID
             var r17 ORDERS
                 WHERE r16.Contains(r.CustomerID)
              */
