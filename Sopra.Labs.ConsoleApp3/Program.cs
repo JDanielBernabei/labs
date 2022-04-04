@@ -12,7 +12,38 @@ namespace Sopra.Labs.ConsoleApp3
     {
         static void Main(string[] args)
         {
-            Ejercicios01042022();
+            EjerciciosFinDeSemana();
+        }
+
+        static void EjerciciosFinDeSemana()
+        {
+            //Listado de unidades vendidas de cada producto ordenado por número total de unidad
+
+
+            //SELECT ProductID, SUM(Quantity) AS Quantity FROM dbo.[Order Details] GROUP BY ProductID ORDER BY Quantity
+
+
+            //Importe facturado por cada producto ordenado por producto
+
+
+            //SELECT ProductID, SUM(Quantity * UnitPrice) AS Quantity FROM dbo.[Order Details] GROUP BY ProductID ORDER BY ProductID
+
+
+            //En la tabla Orders tenemos los gastos de envio en el campo Freight.
+            
+            
+            //Listado de Pedidos agrupado por Empleado, con número de pedidos, importe total factura en concepto de gastos de envio
+            
+            
+            //En la tabla Orders tenemos el identificador de la empresa de transportes ShipVia.
+            
+            
+            //Número de pedidos enviado por cada empresa de transporte.
+            
+            
+            //Listado de pedido enviados por la empresa 3 que incluya el OrderID y número de lineas de pedido (registros en Orders_Details)
+
+
         }
 
         static void EjerciciosIncludeYIntersectYGroupBy() {
