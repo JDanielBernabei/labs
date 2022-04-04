@@ -11,6 +11,7 @@ namespace Sopra.Labs.ConsoleApp4
 {
     internal class Program
     {
+        private static HttpClient http = new HttpClient();
         static void Main(string[] args)
         {
             ZipInfo();
