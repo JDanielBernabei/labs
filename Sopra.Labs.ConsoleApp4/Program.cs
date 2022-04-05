@@ -14,27 +14,58 @@ namespace Sopra.Labs.ConsoleApp4
         private static HttpClient http = new HttpClient();
         static void Main(string[] args)
         {
-            EmtMadridGetToken();
+            TimeArrivalBus(EmtMadridGetToken());
+
         }
 
-        static void EmtMadridGetToken()
+        static void TimeArrivalBus(string accessToken)
         {
-            http.BaseAddress = new Uri("https://openapi.emtmadrid.es/v2/mobilitylabs/user/login/");
+            HttpRequestMessage request = new HttpRequestMessage();
+            request.Headers.Add("accessToken", accessToken);
+            request.RequestUri = new Uri("https://openapi.emtmadrid.es/v2/transport/busemtmad/stops/888/arrives/");
+            string body = "{\"cultureInfo\":\"ES\",\"Text_StopRequired_YN\":\"Y\",\"Text_EstimationsRequired_YN\":\"Y\",\"Text_IncidencesRequired_YN\":\"N\",\"DateTime_Referenced_Incidencies_YYYYMMDD\":\"20220405\"}";
+            request.Content = new StringContent(body, Encoding.UTF8, "application/json");
 
-            //http.DefaultRequestHeaders.Add("Content-Type", "application/json");
-            http.DefaultRequestHeaders.Add("X-ClientId", "d84d5b34-3778-43cd-a491-17a5618bc49c");
-            http.DefaultRequestHeaders.Add("passKey", "B6DC937C60C5757D53B3F9CB4CFF89EBA6E39770222C31215478A4547A95AA10B18CAF131121DB75836FE944DE87C5660D3A49C6121B93A9DF159985F85402A5");
-            
-            var response = http.GetAsync("").Result;
+            request.Method = HttpMethod.Post;
+
+            var response = http.Send(request);
+
             if (response.IsSuccessStatusCode)
             {
                 var data = JsonConvert.DeserializeObject<dynamic>(response.Content.ReadAsStringAsync().Result);
-                Console.WriteLine($"accessToken: {data["data"][0]["accessToken"]}");
+                //Console.WriteLine($"Informacion de parada: {data}");
+                var infoParada = data["data"][0]["Arrive"];
+                foreach(var bus in infoParada)
+                {
+                    Console.WriteLine($"Linea: {bus["line"]}");
+                    Console.WriteLine($"Llegada: {bus["estimateArrive"]}s");
+                }                
             }
             else
             {
                 Console.WriteLine($"Error: {response.StatusCode}");
             }
+        }
+
+        static string EmtMadridGetToken()
+        {
+            http.BaseAddress = new Uri("https://openapi.emtmadrid.es/v2/mobilitylabs/user/login/");
+
+            http.DefaultRequestHeaders.Add("X-ClientId", "d84d5b34-3778-43cd-a491-17a5618bc49c");
+            http.DefaultRequestHeaders.Add("passKey", "B6DC937C60C5757D53B3F9CB4CFF89EBA6E39770222C31215478A4547A95AA10B18CAF131121DB75836FE944DE87C5660D3A49C6121B93A9DF159985F85402A5");
+
+            var response = http.GetAsync("").Result;
+            if (response.IsSuccessStatusCode)
+            {
+                var data = JsonConvert.DeserializeObject<dynamic>(response.Content.ReadAsStringAsync().Result);
+                Console.WriteLine($"Access Token: {data["data"][0]["accessToken"]}");
+                return data["data"][0]["accessToken"];
+            }
+            else
+            {
+                Console.WriteLine($"Error: {response.StatusCode}");
+            }
+            return null;
         }
 
         static void DeleteStudent()
