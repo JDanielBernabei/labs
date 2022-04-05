@@ -14,10 +14,140 @@ namespace Sopra.Labs.ConsoleApp4
         private static HttpClient http = new HttpClient();
         static void Main(string[] args)
         {
-            ZipInfo();
+            PostStudent();
         }
 
-        static void Estudiante()
+        static void DeleteStudent()
+        {
+            // Borrar
+            // http.BaseAddress = new Uri("http://school.labs.com.es/api/students/");
+
+            Student student = new Student();
+
+            Console.Write("Id del estudiante a borar: ");
+            Int32.TryParse(Console.ReadLine(), out int i);
+            student.Id = i;
+
+            var check = http.GetAsync(student.Id.ToString()).Result;
+            string checkContent = check.Content.ReadAsStringAsync().Result;
+            Console.Write($"Estudiante a borar: {checkContent}");
+
+            Console.WriteLine("Confirmar? Y/N");
+            if (Console.ReadLine() == "Y")
+            {
+                http.DeleteAsync(student.Id.ToString());
+                var checkDeleted = http.GetAsync(student.Id.ToString()).Result;
+                if (!checkDeleted.IsSuccessStatusCode)
+                {
+                    Console.WriteLine($"Estudiante borrado:");
+                    student = JsonConvert.DeserializeObject<Student>(checkContent);
+                    Console.WriteLine($"Id: {student.Id}");
+                    Console.WriteLine($"Nombre: {student.Firstname}");
+                    Console.WriteLine($"Apellido: {student.Lastname}");
+                    Console.WriteLine($"Fecha de nacimiento: {student.DateOfBirth}");
+                    Console.WriteLine($"Clase: {student.ClassId}");
+
+                }
+                else
+                {
+                    Console.WriteLine($"Error: Registro no borrado");
+                }
+            }
+            else
+            {
+                Console.WriteLine("Borrado abortado");
+            }
+        }
+
+        static void PutStudent()
+        {
+            // Actualizar
+            // http.BaseAddress = new Uri("http://school.labs.com.es/api/students/");
+
+            Student student = new Student();
+
+            Console.Write("Id del estudiante a modificar: ");
+            Int32.TryParse(Console.ReadLine(), out int i);
+            student.Id = i;
+
+            var check = http.GetAsync(student.Id.ToString()).Result;
+            string checkContent = check.Content.ReadAsStringAsync().Result;
+            Console.WriteLine($"Estudiante a modificar: {checkContent}");
+            Console.WriteLine("Confirmar? Y/N");
+            if (Console.ReadLine() == "Y")
+            {
+                Console.Write("Nombre: ");
+                student.Firstname = Console.ReadLine();
+
+                Console.Write("Apellido: ");
+                student.Lastname = Console.ReadLine();
+
+                Console.Write("Fecha de nacimiento:");
+                student.DateOfBirth = DateTime.Parse(Console.ReadLine());
+
+                Console.Write("Clase: ");
+                Int32.TryParse(Console.ReadLine(), out int j);
+                student.ClassId = j;
+
+                var content = new StringContent(JsonConvert.SerializeObject(student), Encoding.UTF8, "application/json");
+
+                var response = http.PutAsync(student.Id.ToString(), content).Result;
+
+                if (response.IsSuccessStatusCode)
+                {
+                    Console.WriteLine($"Estudiante modificado");
+                }
+                else
+                {
+                    Console.WriteLine($"Error: {response.StatusCode}");
+                }
+            }
+            else
+            {
+                Console.WriteLine("Modificacion abortada");
+            }
+        }
+
+        static void PostStudent()
+        {
+            // Crear una instancia de student
+            // Rellenamo con datos cogidos por consola, menos ID
+            // Conexion Post -> 201 Created -> Student
+            // Mostramos el ID asignado
+            http.BaseAddress = new Uri("http://school.labs.com.es/api/students/");
+
+            Student student = new Student();
+
+            Console.Write("Nombre: ");
+            student.Firstname = Console.ReadLine();
+
+            Console.Write("Apellido: ");
+            student.Lastname = Console.ReadLine();
+
+            Console.Write("Fecha de nacimiento:");
+            student.DateOfBirth = DateTime.Parse(Console.ReadLine());
+
+            Console.Write("Clase: ");
+            Int32.TryParse(Console.ReadLine(), out int j);
+            student.ClassId = j;
+
+            var content = new StringContent(JsonConvert.SerializeObject(student), Encoding.UTF8, "application/json");
+            //Console.WriteLine(JsonConvert.SerializeObject(student));
+
+            var response = http.PostAsync("", content).Result;
+            // var response2 = http.PostAsJsonAsync<Student>("", student).Result;  // En try catch para errores
+
+            if (response.StatusCode == HttpStatusCode.Created)
+            {
+                var studenResponse = JsonConvert.DeserializeObject<Student>(response.Content.ReadAsStringAsync().Result);
+                Console.Write($"ID del estudiante creado: {studenResponse.Id}");
+            }
+            else
+            {
+                Console.WriteLine($"Error: {response.StatusCode}");
+            }
+
+            static void Estudiante()
         {
             // Obtener los datos del estudiante 11. Dos metodos, extenso y abreviado
             //http://school.labs.com.es/api/students/11
