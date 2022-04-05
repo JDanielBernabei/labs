@@ -8,6 +8,23 @@
 	<ItemGroup>
 		<PackageReference Include="Newtonsoft.Json" Version="13.0.1" />
 		<PackageReference Include="Microsoft.AspNet.WebApi.Client" Version="5.2.7" />
+
+		<PackageReference Include="Microsoft.EntityFrameworkCore" Version="5.0.12" />
+		<PackageReference Include="Microsoft.EntityFrameworkCore.Design" Version="5.0.12">
+			<PrivateAssets>all</PrivateAssets>
+			<IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+		</PackageReference>
+		<PackageReference Include="Microsoft.EntityFrameworkCore.SqlServer" Version="5.0.12" />
+		<PackageReference Include="Microsoft.EntityFrameworkCore.SqlServer.Design" Version="1.1.6" />
+		<PackageReference Include="Microsoft.EntityFrameworkCore.Tools" Version="5.0.12">
+			<PrivateAssets>all</PrivateAssets>
+			<IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+		</PackageReference>
+		<PackageReference Include="System.Data.SqlClient" Version="4.8.3" />
+	</ItemGroup>
+
+	<ItemGroup>
+		
 	</ItemGroup>
 
 </Project>

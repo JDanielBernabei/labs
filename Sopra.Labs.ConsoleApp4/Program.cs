@@ -7,15 +7,58 @@ using Newtonsoft.Json;
 using System.Net.Http.Formatting;
 using System.Net.Http.Json;
 
+using System.Collections;
+using System.Linq;
+using System.Data.SqlClient;
+using Microsoft.EntityFrameworkCore;
+
 namespace Sopra.Labs.ConsoleApp4
 {
     internal class Program
     {
         private static HttpClient http = new HttpClient();
+        
         static void Main(string[] args)
         {
-            TimeArrivalBus(EmtMadridGetToken());
+            http.BaseAddress = new Uri("https://openapi.emtmadrid.es/");
+            parkings(EmtMadridGetToken());
 
+        }
+        public class ParkingInfo
+        {
+            [JsonProperty("data")]
+            public List<Parking> Parking { get; set; }
+        }
+
+        public class Parking
+        {
+            public string Name { get; set; }
+            public string Address { get; set; }
+            
+            [JsonProperty("freeParking")]
+            public int? PlazasLibres { get; set; }
+        }
+
+        static void parkings(string accessToken)
+        {
+            //Pedir un parking y dar el numero total de plazas. Hacer la suma usando Linq
+            http.DefaultRequestHeaders.Clear();            
+            http.DefaultRequestHeaders.Add("accessToken", accessToken);
+
+            var response = http.GetAsync("v2/citymad/places/parkings/availability/").Result;
+
+            if (response.StatusCode == HttpStatusCode.OK)
+            {
+                var data = JsonConvert.DeserializeObject<ParkingInfo>(response.Content.ReadAsStringAsync().Result);
+                var parkingData = data.Parking
+                                    .Sum(r => r.PlazasLibres);
+                Console.WriteLine($"Plazas: {parkingData}");
+                Console.ReadLine();
+            }
+            else
+            {
+                Console.WriteLine($"Error: {response.StatusCode}");
+            }
         }
 
         static void TimeArrivalBus(string accessToken)
@@ -23,12 +66,17 @@ namespace Sopra.Labs.ConsoleApp4
             HttpRequestMessage request = new HttpRequestMessage();
             request.Headers.Add("accessToken", accessToken);
             request.RequestUri = new Uri("https://openapi.emtmadrid.es/v2/transport/busemtmad/stops/888/arrives/");
-            string body = "{\"cultureInfo\":\"ES\",\"Text_StopRequired_YN\":\"Y\",\"Text_EstimationsRequired_YN\":\"Y\",\"Text_IncidencesRequired_YN\":\"N\",\"DateTime_Referenced_Incidencies_YYYYMMDD\":\"20220405\"}";
-            request.Content = new StringContent(body, Encoding.UTF8, "application/json");
-
+            //string body = "{\"cultureInfo\":\"ES\",\"Text_StopRequired_YN\":\"Y\",\"Text_EstimationsRequired_YN\":\"Y\",\"Text_IncidencesRequired_YN\":\"N\",\"DateTime_Referenced_Incidencies_YYYYMMDD\":\"20220405\"}";
+            //request.Content = new StringContent(body, Encoding.UTF8, "application/json");
+            var body = new { cultureInfo = "ES", Text_StopRequired_YN = "Y", Text_EstimationsRequired_YN = "Y", Text_IncidencesRequired_YN = "Y", DateTime_Referenced_Incidencies_YYYYMMDD = "20220405" };
+            request.Content = new StringContent(JsonConvert.SerializeObject(body), Encoding.UTF8, "application/json");
+            
             request.Method = HttpMethod.Post;
 
             var response = http.Send(request);
+
+            var content = new StringContent(JsonConvert.SerializeObject(body), Encoding.UTF8, "application/json");
+            var response2 = http.PostAsync($"transport/busemtmad/stops/{{numParada}}/arrives/", content);
 
             if (response.IsSuccessStatusCode)
             {
@@ -49,12 +97,10 @@ namespace Sopra.Labs.ConsoleApp4
 
         static string EmtMadridGetToken()
         {
-            http.BaseAddress = new Uri("https://openapi.emtmadrid.es/v2/mobilitylabs/user/login/");
+            http.DefaultRequestHeaders.Add("X-ClientId", "66f93756-02d8-4fa7-945f-d72a1e34816c");
+            http.DefaultRequestHeaders.Add("passKey", "21FCE554F2F2975497079C6ECF1A3B253EC654193F275ED61862D3B4E2D634B4911B8C6F39CFEB28FF5869EF7CFA7057DC34D1269A7B0D80E5749062E18ECE60");
 
-            http.DefaultRequestHeaders.Add("X-ClientId", "d84d5b34-3778-43cd-a491-17a5618bc49c");
-            http.DefaultRequestHeaders.Add("passKey", "B6DC937C60C5757D53B3F9CB4CFF89EBA6E39770222C31215478A4547A95AA10B18CAF131121DB75836FE944DE87C5660D3A49C6121B93A9DF159985F85402A5");
-
-            var response = http.GetAsync("").Result;
+            var response = http.GetAsync("v2/mobilitylabs/user/login/").Result;
             if (response.IsSuccessStatusCode)
             {
                 var data = JsonConvert.DeserializeObject<dynamic>(response.Content.ReadAsStringAsync().Result);
