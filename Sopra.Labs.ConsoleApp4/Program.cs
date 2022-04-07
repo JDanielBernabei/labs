@@ -24,13 +24,13 @@ namespace Sopra.Labs.ConsoleApp4
             parkings(EmtMadridGetToken());
 
         }
-        public class ParkingInfo
+        public class ParkingResponse
         {
             [JsonProperty("data")]
-            public List<Parking> Parking { get; set; }
+            public List<ParkingData> Parkings { get; set; }
         }
 
-        public class Parking
+        public class ParkingData
         {
             public string Name { get; set; }
             public string Address { get; set; }
@@ -38,6 +38,25 @@ namespace Sopra.Labs.ConsoleApp4
             [JsonProperty("freeParking")]
             public int? PlazasLibres { get; set; }
         }
+
+        /*
+            public class ParkingResponse
+            {
+                public string Code { get; set; }
+                public string Description { get; set; }
+
+                [JsonProperty("datetime")]
+                public DateTime DateTimeData { get; set; }
+                public List<ParkingData> Data { get; set; }
+            }
+            public class ParkingData
+            {
+                public int Id { get; set; }
+                public string Name { get; set; }
+                public int? FreeParking { get; set; }
+            }
+
+         */
 
         static void parkings(string accessToken)
         {
@@ -49,8 +68,9 @@ namespace Sopra.Labs.ConsoleApp4
 
             if (response.StatusCode == HttpStatusCode.OK)
             {
-                var data = JsonConvert.DeserializeObject<ParkingInfo>(response.Content.ReadAsStringAsync().Result);
-                var parkingData = data.Parking
+                var data = JsonConvert.DeserializeObject<ParkingResponse>(response.Content.ReadAsStringAsync().Result);
+                // Comprobar que se ha recibido la respuesta correcta
+                var parkingData = data.Parkings
                                     .Sum(r => r.PlazasLibres);
                 Console.WriteLine($"Plazas: {parkingData}");
                 Console.ReadLine();
