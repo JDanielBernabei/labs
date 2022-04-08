@@ -68,6 +68,7 @@
   </ItemGroup>
   <ItemGroup>
     <Content Include="ejercicio1.html" />
+    <Content Include="ejercicio2.html" />
     <Content Include="vendor\bootstrap-5.1.3\css\bootstrap-grid.css" />
     <Content Include="vendor\bootstrap-5.1.3\css\bootstrap-grid.min.css" />
     <Content Include="vendor\bootstrap-5.1.3\css\bootstrap-grid.rtl.css" />
