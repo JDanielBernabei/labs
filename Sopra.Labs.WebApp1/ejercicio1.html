@@ -1,0 +1,33 @@
+﻿<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8" />
+    <title>Ejercicio 1</title>
+    <link href="vendor/bootstrap-5.1.3/css/bootstrap.css" rel="stylesheet" />
+</head>
+<body>
+    <!-- El objeto EVENT tiene las propiedades clientX y clientY-->
+    <div class="container" style="min-height:1000px">
+        <div class="row">
+            <div class="col-4"> </div>
+            <div class="col-2 text-center">
+                <!-- Coordenada X-->
+                <h2 id="coordenadaX">Coordenada X</h2>
+            </div>
+            <div class="col-2 text-center">
+                <!-- Coordenada Y-->
+                <h2 id="coordenadaY">Coordenada Y</h2>
+            </div>
+            <div class="col-4"> </div>
+        </div>
+    </div>
+
+    <script type="text/javascript">
+        document.body.onmousemove = function (e) {
+            console.log("hola");
+            document.getElementById("coordenadaX").innerText = e.clientX;
+            document.getElementById("coordenadaY").innerText = e.clientY;
+        }
+    </script>
+</body>
+</html>
